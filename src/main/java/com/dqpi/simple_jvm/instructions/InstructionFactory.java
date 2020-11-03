@@ -1,0 +1,258 @@
+package com.dqpi.simple_jvm.instructions;
+
+import com.dqpi.simple_jvm.instructions.comparisons.*;
+import com.dqpi.simple_jvm.instructions.constants.*;
+import com.dqpi.simple_jvm.instructions.control.GOTO;
+import com.dqpi.simple_jvm.instructions.control.LOOKUP_SWITCH;
+import com.dqpi.simple_jvm.instructions.control.Return;
+import com.dqpi.simple_jvm.instructions.control.TABLE_SWITCH;
+import com.dqpi.simple_jvm.instructions.conversions.D2X;
+import com.dqpi.simple_jvm.instructions.conversions.F2X;
+import com.dqpi.simple_jvm.instructions.conversions.I2X;
+import com.dqpi.simple_jvm.instructions.conversions.L2X;
+import com.dqpi.simple_jvm.instructions.extended.GOTO_W;
+import com.dqpi.simple_jvm.instructions.extended.IFNONNULL;
+import com.dqpi.simple_jvm.instructions.extended.IFNULL;
+import com.dqpi.simple_jvm.instructions.extended.WIDE;
+import com.dqpi.simple_jvm.instructions.loads.*;
+import com.dqpi.simple_jvm.instructions.math.*;
+import com.dqpi.simple_jvm.instructions.references.*;
+import com.dqpi.simple_jvm.instructions.reserved.InvokeNative;
+import com.dqpi.simple_jvm.instructions.stack.Dup;
+import com.dqpi.simple_jvm.instructions.stack.Pop;
+import com.dqpi.simple_jvm.instructions.stack.SWAP;
+import com.dqpi.simple_jvm.instructions.stores.*;
+import lombok.SneakyThrows;
+import org.springframework.context.ApplicationContext;
+import org.springframework.stereotype.Component;
+
+import javax.annotation.Resource;
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * @author TheBIGMountain
+ * @date 2020/10/29
+ */
+@Component
+public class InstructionFactory {
+    @Resource
+    private ApplicationContext ctx;
+    private final Map<Integer, GetInstruction> instructionMap;
+    
+    public InstructionFactory() {
+        instructionMap = new HashMap<>();
+        
+        instructionMap.put(0x00, () -> ctx.getBean(NOP.class));
+        instructionMap.put(0x01, () -> ctx.getBean(ACONST_NULL.class));
+        instructionMap.put(0x02, () -> ctx.getBean(IntConst.ICONST_M1.class));
+        instructionMap.put(0x03, () -> ctx.getBean(IntConst.ICONST_0.class));
+        instructionMap.put(0x04, () -> ctx.getBean(IntConst.ICONST_1.class));
+        instructionMap.put(0x05, () -> ctx.getBean(IntConst.ICONST_2.class));
+        instructionMap.put(0x06, () -> ctx.getBean(IntConst.ICONST_3.class));
+        instructionMap.put(0x07, () -> ctx.getBean(IntConst.ICONST_4.class));
+        instructionMap.put(0x08, () -> ctx.getBean(IntConst.ICONST_5.class));
+        instructionMap.put(0x09, () -> ctx.getBean(LongConst.LCONST_0.class));
+        instructionMap.put(0x0a, () -> ctx.getBean(LongConst.LCONST_1.class));
+        instructionMap.put(0x0b, () -> ctx.getBean(FloatConst.FCONST_0.class));
+        instructionMap.put(0x0c, () -> ctx.getBean(FloatConst.FCONST_1.class));
+        instructionMap.put(0x0d, () -> ctx.getBean(FloatConst.FCONST_2.class));
+        instructionMap.put(0x0e, () -> ctx.getBean(DoubleConst.DCONST_0.class));
+        instructionMap.put(0x0f, () -> ctx.getBean(DoubleConst.DCONST_1.class));
+        instructionMap.put(0x10, () -> ctx.getBean(Push.BIPUSH.class));
+        instructionMap.put(0x11, () -> ctx.getBean(Push.SIPUSH.class));
+        instructionMap.put(0x12, () -> ctx.getBean(Ldc.LDC.class));
+        instructionMap.put(0x13, () -> ctx.getBean(Ldc.LDC_W.class));
+        instructionMap.put(0x14, () -> ctx.getBean(Ldc.LDC2_W.class));
+        instructionMap.put(0x15, () -> ctx.getBean(IntLoad.ILOAD.class));
+        instructionMap.put(0x16, () -> ctx.getBean(LongLoad.LLOAD.class));
+        instructionMap.put(0x17, () -> ctx.getBean(FloatLoad.FLOAD.class));
+        instructionMap.put(0x18, () -> ctx.getBean(DoubleLoad.DLOAD.class));
+        instructionMap.put(0x19, () -> ctx.getBean(RefLoad.ALOAD.class));
+        instructionMap.put(0x1a, () -> ctx.getBean(IntLoad.ILOAD_0.class));
+        instructionMap.put(0x1b, () -> ctx.getBean(IntLoad.ILOAD_1.class));
+        instructionMap.put(0x1c, () -> ctx.getBean(IntLoad.ILOAD_2.class));
+        instructionMap.put(0x1d, () -> ctx.getBean(IntLoad.ILOAD_3.class));
+        instructionMap.put(0x1e, () -> ctx.getBean(LongLoad.LLOAD_0.class));
+        instructionMap.put(0x1f, () -> ctx.getBean(LongLoad.LLOAD_1.class));
+        instructionMap.put(0x20, () -> ctx.getBean(LongLoad.LLOAD_2.class));
+        instructionMap.put(0x21, () -> ctx.getBean(LongLoad.LLOAD_3.class));
+        instructionMap.put(0x22, () -> ctx.getBean(FloatLoad.FLOAD_0.class));
+        instructionMap.put(0x23, () -> ctx.getBean(FloatLoad.FLOAD_1.class));
+        instructionMap.put(0x24, () -> ctx.getBean(FloatLoad.FLOAD_2.class));
+        instructionMap.put(0x25, () -> ctx.getBean(FloatLoad.FLOAD_3.class));
+        instructionMap.put(0x26, () -> ctx.getBean(DoubleLoad.DLOAD_0.class));
+        instructionMap.put(0x27, () -> ctx.getBean(DoubleLoad.DLOAD_1.class));
+        instructionMap.put(0x28, () -> ctx.getBean(DoubleLoad.DLOAD_2.class));
+        instructionMap.put(0x29, () -> ctx.getBean(DoubleLoad.DLOAD_3.class));
+        instructionMap.put(0x2a, () -> ctx.getBean(RefLoad.ALOAD_0.class));
+        instructionMap.put(0x2b, () -> ctx.getBean(RefLoad.ALOAD_1.class));
+        instructionMap.put(0x2c, () -> ctx.getBean(RefLoad.ALOAD_2.class));
+        instructionMap.put(0x2d, () -> ctx.getBean(RefLoad.ALOAD_3.class));
+        instructionMap.put(0x2e, () -> ctx.getBean(ArrEleLoad.IALOAD.class));
+        instructionMap.put(0x2f, () -> ctx.getBean(ArrEleLoad.LALOAD.class));
+        instructionMap.put(0x30, () -> ctx.getBean(ArrEleLoad.FALOAD.class));
+        instructionMap.put(0x31, () -> ctx.getBean(ArrEleLoad.DALOAD.class));
+        instructionMap.put(0x32, () -> ctx.getBean(ArrEleLoad.AALOAD.class));
+        instructionMap.put(0x33, () -> ctx.getBean(ArrEleLoad.BALOAD.class));
+        instructionMap.put(0x34, () -> ctx.getBean(ArrEleLoad.CALOAD.class));
+        instructionMap.put(0x35, () -> ctx.getBean(ArrEleLoad.SALOAD.class));
+        instructionMap.put(0x36, () -> ctx.getBean(IntStore.ISTORE.class));
+        instructionMap.put(0x37, () -> ctx.getBean(LongStore.LSTORE.class));
+        instructionMap.put(0x38, () -> ctx.getBean(FloatStore.FSTORE.class));
+        instructionMap.put(0x39, () -> ctx.getBean(DoubleStore.DSTORE.class));
+        instructionMap.put(0x3a, () -> ctx.getBean(RefStore.ASTORE.class));
+        instructionMap.put(0x3b, () -> ctx.getBean(IntStore.ISTORE_0.class));
+        instructionMap.put(0x3c, () -> ctx.getBean(IntStore.ISTORE_1.class));
+        instructionMap.put(0x3d, () -> ctx.getBean(IntStore.ISTORE_2.class));
+        instructionMap.put(0x3e, () -> ctx.getBean(IntStore.ISTORE_3.class));
+        instructionMap.put(0x3f, () -> ctx.getBean(LongStore.LSTORE_0.class));
+        instructionMap.put(0x40, () -> ctx.getBean(LongStore.LSTORE_1.class));
+        instructionMap.put(0x41, () -> ctx.getBean(LongStore.LSTORE_2.class));
+        instructionMap.put(0x42, () -> ctx.getBean(LongStore.LSTORE_3.class));
+        instructionMap.put(0x43, () -> ctx.getBean(FloatStore.FSTORE_0.class));
+        instructionMap.put(0x44, () -> ctx.getBean(FloatStore.FSTORE_1.class));
+        instructionMap.put(0x45, () -> ctx.getBean(FloatStore.FSTORE_2.class));
+        instructionMap.put(0x46, () -> ctx.getBean(FloatStore.FSTORE_3.class));
+        instructionMap.put(0x47, () -> ctx.getBean(DoubleStore.DSTORE_0.class));
+        instructionMap.put(0x48, () -> ctx.getBean(DoubleStore.DSTORE_1.class));
+        instructionMap.put(0x49, () -> ctx.getBean(DoubleStore.DSTORE_2.class));
+        instructionMap.put(0x4a, () -> ctx.getBean(DoubleStore.DSTORE_3.class));
+        instructionMap.put(0x4b, () -> ctx.getBean(RefStore.ASTORE_0.class));
+        instructionMap.put(0x4c, () -> ctx.getBean(RefStore.ASTORE_1.class));
+        instructionMap.put(0x4d, () -> ctx.getBean(RefStore.ASTORE_2.class));
+        instructionMap.put(0x4e, () -> ctx.getBean(RefStore.ASTORE_3.class));
+        instructionMap.put(0x4f, () -> ctx.getBean(ArrEleStore.IASTORE.class));
+        instructionMap.put(0x50, () -> ctx.getBean(ArrEleStore.LASTORE.class));
+        instructionMap.put(0x51, () -> ctx.getBean(ArrEleStore.FASTORE.class));
+        instructionMap.put(0x52, () -> ctx.getBean(ArrEleStore.DASTORE.class));
+        instructionMap.put(0x53, () -> ctx.getBean(ArrEleStore.AASTORE.class));
+        instructionMap.put(0x54, () -> ctx.getBean(ArrEleStore.BASTORE.class));
+        instructionMap.put(0x55, () -> ctx.getBean(ArrEleStore.CASTORE.class));
+        instructionMap.put(0x56, () -> ctx.getBean(ArrEleStore.SASTORE.class));
+        instructionMap.put(0x57, () -> ctx.getBean(Pop.POP.class));
+        instructionMap.put(0x58, () -> ctx.getBean(Pop.POP2.class));
+        instructionMap.put(0x59, () -> ctx.getBean(Dup.DUP.class));
+        instructionMap.put(0x5a, () -> ctx.getBean(Dup.DUP_X1.class));
+        instructionMap.put(0x5b, () -> ctx.getBean(Dup.DUP_X2.class));
+        instructionMap.put(0x5c, () -> ctx.getBean(Dup.DUP2.class));
+        instructionMap.put(0x5d, () -> ctx.getBean(Dup.DUP2_X1.class));
+        instructionMap.put(0x5e, () -> ctx.getBean(Dup.DUP2_X2.class));
+        instructionMap.put(0x5f, () -> ctx.getBean(SWAP.class));
+        instructionMap.put(0x60, () -> ctx.getBean(Add.IADD.class));
+        instructionMap.put(0x61, () -> ctx.getBean(Add.LADD.class));
+        instructionMap.put(0x62, () -> ctx.getBean(Add.FADD.class));
+        instructionMap.put(0x63, () -> ctx.getBean(Add.DADD.class));
+        instructionMap.put(0x64, () -> ctx.getBean(Sub.ISUB.class));
+        instructionMap.put(0x65, () -> ctx.getBean(Sub.LSUB.class));
+        instructionMap.put(0x66, () -> ctx.getBean(Sub.FSUB.class));
+        instructionMap.put(0x67, () -> ctx.getBean(Sub.DSUB.class));
+        instructionMap.put(0x68, () -> ctx.getBean(Mul.IMUL.class));
+        instructionMap.put(0x69, () -> ctx.getBean(Mul.LMUL.class));
+        instructionMap.put(0x6a, () -> ctx.getBean(Mul.FMUL.class));
+        instructionMap.put(0x6b, () -> ctx.getBean(Mul.DMUL.class));
+        instructionMap.put(0x6c, () -> ctx.getBean(Div.IDIV.class));
+        instructionMap.put(0x6d, () -> ctx.getBean(Div.LDIV.class));
+        instructionMap.put(0x6e, () -> ctx.getBean(Div.FDIV.class));
+        instructionMap.put(0x6f, () -> ctx.getBean(Div.DDIV.class));
+        instructionMap.put(0x70, () -> ctx.getBean(Rem.IREM.class));
+        instructionMap.put(0x71, () -> ctx.getBean(Rem.LREM.class));
+        instructionMap.put(0x72, () -> ctx.getBean(Rem.FREM.class));
+        instructionMap.put(0x73, () -> ctx.getBean(Rem.DREM.class));
+        instructionMap.put(0x74, () -> ctx.getBean(Neg.INEG.class));
+        instructionMap.put(0x75, () -> ctx.getBean(Neg.LNEG.class));
+        instructionMap.put(0x76, () -> ctx.getBean(Neg.FNEG.class));
+        instructionMap.put(0x77, () -> ctx.getBean(Neg.DNEG.class));
+        instructionMap.put(0x78, () -> ctx.getBean(Sh.ISHL.class));
+        instructionMap.put(0x79, () -> ctx.getBean(Sh.LSHL.class));
+        instructionMap.put(0x7a, () -> ctx.getBean(Sh.ISHR.class));
+        instructionMap.put(0x7b, () -> ctx.getBean(Sh.LSHR.class));
+        instructionMap.put(0x7c, () -> ctx.getBean(Sh.IUSHR.class));
+        instructionMap.put(0x7d, () -> ctx.getBean(Sh.LUSHR.class));
+        instructionMap.put(0x7e, () -> ctx.getBean(And.IAND.class));
+        instructionMap.put(0x7f, () -> ctx.getBean(And.LAND.class));
+        instructionMap.put(0x80, () -> ctx.getBean(Or.IOR.class));
+        instructionMap.put(0x81, () -> ctx.getBean(Or.LOR.class));
+        instructionMap.put(0x82, () -> ctx.getBean(Xor.IXOR.class));
+        instructionMap.put(0x83, () -> ctx.getBean(Xor.LXOR.class));
+        instructionMap.put(0x84, () -> ctx.getBean(IINC.class));
+        instructionMap.put(0x85, () -> ctx.getBean(I2X.I2L.class));
+        instructionMap.put(0x86, () -> ctx.getBean(I2X.I2F.class));
+        instructionMap.put(0x87, () -> ctx.getBean(I2X.I2D.class));
+        instructionMap.put(0x88, () -> ctx.getBean(L2X.L2I.class));
+        instructionMap.put(0x89, () -> ctx.getBean(L2X.L2F.class));
+        instructionMap.put(0x8a, () -> ctx.getBean(L2X.L2D.class));
+        instructionMap.put(0x8b, () -> ctx.getBean(F2X.F2I.class));
+        instructionMap.put(0x8c, () -> ctx.getBean(F2X.F2L.class));
+        instructionMap.put(0x8d, () -> ctx.getBean(F2X.F2D.class));
+        instructionMap.put(0x8e, () -> ctx.getBean(D2X.D2I.class));
+        instructionMap.put(0x8f, () -> ctx.getBean(D2X.D2L.class));
+        instructionMap.put(0x90, () -> ctx.getBean(D2X.D2F.class));
+        instructionMap.put(0x91, () -> ctx.getBean(I2X.I2B.class));
+        instructionMap.put(0x92, () -> ctx.getBean(I2X.I2C.class));
+        instructionMap.put(0x93, () -> ctx.getBean(I2X.I2S.class));
+        instructionMap.put(0x94, () -> ctx.getBean(LCMP.class));
+        instructionMap.put(0x95, () -> ctx.getBean(FloatCmp.FCMPL.class));
+        instructionMap.put(0x96, () -> ctx.getBean(FloatCmp.FCMPG.class));
+        instructionMap.put(0x97, () -> ctx.getBean(DoubleCmp.DCMPL.class));
+        instructionMap.put(0x98, () -> ctx.getBean(DoubleCmp.DCMPG.class));
+        instructionMap.put(0x99, () -> ctx.getBean(IfCond.IFEQ.class));
+        instructionMap.put(0x9a, () -> ctx.getBean(IfCond.IFNE.class));
+        instructionMap.put(0x9b, () -> ctx.getBean(IfCond.IFLT.class));
+        instructionMap.put(0x9c, () -> ctx.getBean(IfCond.IFGE.class));
+        instructionMap.put(0x9d, () -> ctx.getBean(IfCond.IFGT.class));
+        instructionMap.put(0x9e, () -> ctx.getBean(IfCond.IFLE.class));
+        instructionMap.put(0x9f, () -> ctx.getBean(IfIntCmp.IF_ICMPEQ.class));
+        instructionMap.put(0xa0, () -> ctx.getBean(IfIntCmp.IF_ICMPNE.class));
+        instructionMap.put(0xa1, () -> ctx.getBean(IfIntCmp.IF_ICMPLT.class));
+        instructionMap.put(0xa2, () -> ctx.getBean(IfIntCmp.IF_ICMPGE.class));
+        instructionMap.put(0xa3, () -> ctx.getBean(IfIntCmp.IF_ICMPGT.class));
+        instructionMap.put(0xa4, () -> ctx.getBean(IfIntCmp.IF_ICMPLE.class));
+        instructionMap.put(0xa5, () -> ctx.getBean(IfRefCmp.IF_ACMPEQ.class));
+        instructionMap.put(0xa6, () -> ctx.getBean(IfRefCmp.IF_ACMPNE.class));
+        instructionMap.put(0xa7, () -> ctx.getBean(GOTO.class));
+        instructionMap.put(0xaa, () -> ctx.getBean(TABLE_SWITCH.class));
+        instructionMap.put(0xab, () -> ctx.getBean(LOOKUP_SWITCH.class));
+        instructionMap.put(0xac, () -> ctx.getBean(Return.IRETURN.class));
+        instructionMap.put(0xad, () -> ctx.getBean(Return.LRETURN.class));
+        instructionMap.put(0xae, () -> ctx.getBean(Return.FRETURN.class));
+        instructionMap.put(0xaf, () -> ctx.getBean(Return.DRETURN.class));
+        instructionMap.put(0xb0, () -> ctx.getBean(Return.ARETURN.class));
+        instructionMap.put(0xb1, () -> ctx.getBean(Return.RETURN.class));
+        instructionMap.put(0xb2, () -> ctx.getBean(StaticInst.GET_STATIC.class));
+        instructionMap.put(0xb3, () -> ctx.getBean(StaticInst.PUT_STATIC.class));
+        instructionMap.put(0xb4, () -> ctx.getBean(FieldInst.GET_FIELD.class));
+        instructionMap.put(0xb5, () -> ctx.getBean(FieldInst.PUT_FIELD.class));
+        instructionMap.put(0xb6, () -> ctx.getBean(INVOKE_VIRTUAL.class));
+        instructionMap.put(0xb7, () -> ctx.getBean(INVOKE_SPECIAL.class));
+        instructionMap.put(0xb8, () -> ctx.getBean(INVOKE_STATIC.class));
+        instructionMap.put(0xb9, () -> ctx.getBean(INVOKE_INTERFACE.class));
+        instructionMap.put(0xbb, () -> ctx.getBean(NEW.class));
+        instructionMap.put(0xbc, () -> ctx.getBean(ArrayInst.NEW_ARRAY.class));
+        instructionMap.put(0xbd, () -> ctx.getBean(ArrayInst.ANEW_ARRAY.class));
+        instructionMap.put(0xbe, () -> ctx.getBean(ArrayInst.ARRAY_LENGTH.class));
+        instructionMap.put(0xbf, () -> ctx.getBean(ATHROW.class));
+        instructionMap.put(0xc0, () -> ctx.getBean(TypeCheckInst.CHECK_CAST.class));
+        instructionMap.put(0xc1, () -> ctx.getBean(TypeCheckInst.INSTANCE_OF.class));
+        instructionMap.put(0xc4, () -> ctx.getBean(WIDE.class));
+        instructionMap.put(0xc5, () -> ctx.getBean(ArrayInst.MULTI_ANEW_ARRAY.class));
+        instructionMap.put(0xc6, () -> ctx.getBean(IFNULL.class));
+        instructionMap.put(0xc7, () -> ctx.getBean(IFNONNULL.class));
+        instructionMap.put(0xc8, () -> ctx.getBean(GOTO_W.class));
+        instructionMap.put(0xfe, () -> ctx.getBean(InvokeNative.class));
+    }
+    
+    @SneakyThrows
+    public Instruction newInstruction(int opcode) {
+        GetInstruction fun = instructionMap.get(opcode);
+        if (fun != null) {
+            return fun.execute();
+        }
+        System.out.println(opcode);
+        throw new Exception("Unsupported opcode!");
+    }
+    
+    private interface GetInstruction {
+        Instruction execute();
+    }
+}

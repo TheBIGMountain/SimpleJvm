@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<?import javafx.scene.canvas.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+
+<Pane prefHeight="800.0" prefWidth="1200.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.dqpi.simple_jvm.vm.MainVm">
+    <Button id="next" text="  执行指令  " onMouseClicked="#stop" layoutX="795"/>
+    <Button id="classSelect" layoutX="887.0" onMouseClicked="#select" text="选择class文件"/>
+    <TextField id="classFileName" editable="false" layoutX="992.0" prefWidth="120"/>
+    <Button id="starJvm" layoutX="1115.0" onMouseClicked="#startJvm" text="启动虚拟机"/>
+    <Canvas id="canvas" height="570.0" layoutY="30.0" width="1200.0"/>
+    <TextArea id="console" layoutY="600" prefHeight="200" prefWidth="1200" style="-fx-font-size: 20px"/>
+</Pane>
